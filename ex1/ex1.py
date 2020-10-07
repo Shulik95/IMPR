@@ -4,6 +4,8 @@ from skimage.color import rgb2gray
 import matplotlib.pyplot as plt
 
 MAX_GRAY_SCALE = 255
+TWO_DIM = 2
+THREE_DIM = 3
 
 
 def read_image(file_name, representation):
@@ -15,11 +17,11 @@ def read_image(file_name, representation):
     :return: an image with intensities normalized to the range [0,1]
     """
     img = np.array(imread(file_name))
-    img_float = img.astype(np.float64)
+    img_float = img.astype(np.float64) / MAX_GRAY_SCALE
     if representation == 1:  # return grayscale image
-        if img.ndim == 2:  # image was given in grayscale
+        if img.ndim == TWO_DIM:  # image was given in grayscale
             return img_float
-        elif img.ndim == 3:  # image is rgb, convert to grayscale
+        elif img.ndim == THREE_DIM:  # image is rgb, convert to grayscale
             return rgb2gray(img_float)
     elif representation == 2:  # return rgb
         return img_float
