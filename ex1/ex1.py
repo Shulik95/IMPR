@@ -12,7 +12,7 @@ THREE_DIM = 3
 # transformation matrix for rgb to yiq #
 rgb2yiq_matrix = np.array([[0.299, 0.587, 0.114],
                            [0.596, -0.275, -0.321],
-                           [0.212, -0.523, 0.311]])
+                           [0.212, -0.523, 0.311]], dtype=np.float64)
 
 
 # ---------- functions ---------- #
@@ -51,12 +51,12 @@ def rgb2yiq(imRGB):
     """
     transforms an RGB image into the YIQ color space.
     :param imRGB: image to transform.
-    :return: the YIQ values as a matrix
+    :return: the image in YIQ color space
     """
     ret_arr = np.zeros(shape=imRGB.shape, dtype=np.float64)  # same size matrix
     for i in range(THREE_DIM):
-        ret_arr[:, :, i] = rgb2yiq_matrix[i][0] * imRGB[:, :, 0] +\
-                           rgb2yiq_matrix[i][1] * imRGB[:, :, 1] +\
+        ret_arr[:, :, i] = rgb2yiq_matrix[i][0] * imRGB[:, :, 0] + \
+                           rgb2yiq_matrix[i][1] * imRGB[:, :, 1] + \
                            rgb2yiq_matrix[i][2] * imRGB[:, :, 2]
     return ret_arr
 
@@ -65,9 +65,18 @@ def yiq2rgb(imYIQ):
     """
     transforms an YIQ image into the RGB color space.
     :param imYIQ: image to transform.
-    :return:
+    :return: the image in RGB color space
     """
-    
+    ret_arr = np.zeros(shape=imYIQ.shape, dtype=np.float64)
+    inverse_mat = np.linalg.inv(rgb2yiq_matrix)
+    for i in range(THREE_DIM):
+        ret_arr[:, :, i] = inverse_mat[i][0] * imYIQ[:, :, 0] + \
+                           inverse_mat[i][1] * imYIQ[:, :, 1] + \
+                           inverse_mat[i][2] * imYIQ[:, :, 2]
+    return ret_arr
+
 
 if __name__ == '__main__':
-    print(rgb2yiq(read_image("rgbimage.jpg", 2)).ndim)
+    orig = read_image("rgbimage.jpg", 2)
+    after = yiq2rgb(rgb2yiq(read_image("rgbimage.jpg", 2)))
+    print(np.array_equal(orig, after))
